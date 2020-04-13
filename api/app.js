@@ -1,27 +1,54 @@
+const { Readable, Writable } = require("stream");
 const express = require("express");
 const fs = require("fs");
-// var stream = require("stream")
-const buffer = require("buffer");
 const app = express();
 const cors = require("cors");
 const port = 3001;
 const proxy = require("express-http-proxy");
 
+var streams = require("memory-streams");
+var streamBuffers = require("stream-buffers");
+
+const globalStreams = {};
 const globalBuffers = {};
 
 app.unsubscribe(cors());
-// app.get("/", (req, res) => res.send("Hello World!"));
 app.post("/audio/:id", function (req, res) {
+  console.log("Data post init");
   const _id = req.params.id;
-  let buffer = globalBuffers[_id];
-  if (!buffer) {
-    let buffer = new Buffer();
-    globalBuffers[_id] = buffer;
+  let stream = globalStreams[_id];
+  if (!stream) {
+    stream = new streamBuffers.ReadableStreamBuffer({});
+
+    globalStreams[_id] = stream;
   }
-  // buffer.write(req.)
+  req.on("data", (data) => {
+    stream.put(data);
+  });
+  req.on("end", () => {
+    console.log("request end");
+    res.status(200);
+    res.end();
+  });
+});
+app.get("/audio/:id", function (req, res) {
+  const _id = req.params.id;
+  let stream = globalStreams[_id];
+  console.log(":Reading from /audio/:id", _id);
+  if (!stream) {
+    res.status = 404;
+    res.end("No such buffer");
+    console.log("**ERROR: no buffer found.");
+    return;
+  } else {
+    const head = {
+      "Content-Type": "audio/webm;codecs=opus",
+    };
+    res.writeHead(200, head);
+    stream.pipe(res);
+  }
 });
 app.get("/audio", function (req, res) {
-  //   const path = "ff-16b-2c-44100hz.mp3";
   const path = "out.mp3";
   const stat = fs.statSync(path);
   const fileSize = stat.size;

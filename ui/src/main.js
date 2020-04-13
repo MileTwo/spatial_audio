@@ -3,12 +3,11 @@ let buttonName = "Start";
 let pos1 = { x: 0, y: 0 };
 
 let listener;
-let audioCtx;
+
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+let audioCtx = new AudioContext();
 
 let handleClick = () => {
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  audioCtx = new AudioContext();
-
   /* Panner for spatial audio: */
   const panner = audioCtx.createPanner();
   panner.setOrientation(1, 0, 0);
@@ -24,19 +23,10 @@ let handleClick = () => {
   panner.coneOuterAngle = 0;
   panner.coneOuterGain = 0;
 
-  /* Destination for pushing chunks.. */
-  var dest = audioCtx.createMediaStreamDestination();
-  var mediaRecorder = new MediaRecorder(dest.stream);
-
-  mediaRecorder.ondataavailable = function (evt) {
-    // push each chunk (blobs) in an array
-    // chunks.push(evt.data);
-    // TODO -- stream the data to the server!!
-  };
   let audio = document.querySelector("audio");
   var audioSrc = audioCtx.createMediaElementSource(audio);
-  audioSrc.connect(panner).connect(dest).connect(audioCtx.destination);
-  audio.src = "http://localhost:3001/audio";
+  audioSrc.connect(panner).connect(audioCtx.destination);
+  audio.src = "http://localhost:3001/audio/1";
   audio.controls = true;
   audio.play();
 };
@@ -52,7 +42,21 @@ let handleRecord = async () => {
   console.log("getting mediastream:");
   try {
     let mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-    //await context.audioWorklet.addModule('bypass-processor.js');
+
+    var mediaRecorder = new MediaRecorder(mediaStream, { mimeType: "audio/webm;codecs=opus" });
+
+    mediaRecorder.ondataavailable = async (e) => {
+      console.log("data is available...");
+      try {
+        await fetch("http://localhost:3001/audio/1", {
+          method: "POST",
+          body: e.data,
+        });
+      } catch (err) {
+        console.log("error", err);
+      }
+    };
+    mediaRecorder.start(500);
   } catch (err) {
     console.log("error", err);
   }
