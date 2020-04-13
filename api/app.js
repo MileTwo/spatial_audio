@@ -11,6 +11,19 @@ var streamBuffers = require("stream-buffers");
 const globalStreams = {};
 
 app.unsubscribe(cors());
+app.post("/clearBuffer/:id", function (req, res) {
+  const _id = req.params.id;
+  try {
+    let stream = new streamBuffers.ReadableStreamBuffer({});
+    globalStreams[_id] = stream;
+    res.status(200);
+    res.end();
+  } catch (err) {
+    console.error(error, err);
+    res.status(500);
+    res.end();
+  }
+});
 app.post("/audio/:id", function (req, res) {
   console.log("Data post init");
   const _id = req.params.id;

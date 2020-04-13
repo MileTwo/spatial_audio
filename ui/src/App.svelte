@@ -1,11 +1,10 @@
 <script>
-  //   export let name;
   export let handleClick;
-  export let buttonName;
-  export let pos1;
-  //   export let pos2;
+  export let pos;
   export let updateDistance;
   export let handleRecord;
+
+  export let clients;
 </script>
 
 <style>
@@ -32,28 +31,47 @@
 
 <main>
 
-  <fieldset>
-    <legend>Sound 1</legend>
-    X
-    <input type="number" bind:value={pos1.x} on:change={updateDistance()} />
-    <input
-      type="range"
-      bind:value={pos1.x}
-      on:change={updateDistance()}
-      min="-10"
-      max="10" />
-    Y
-    <input type="number" bind:value={pos1.y} on:change={updateDistance()} />
-    <input
-      type="range"
-      bind:value={pos1.y}
-      on:change={updateDistance()}
-      min="-10"
-      max="10" />
-  </fieldset>
-  <audio />
+  {#each clients as c}
+    <fieldset>
+      <legend>Sound {c}</legend>
+      X
+      <input
+        type="number"
+        bind:value={pos[c].x}
+        on:change={updateDistance(c)} />
+      <input
+        type="range"
+        bind:value={pos[c].x}
+        on:change={updateDistance(c)}
+        min="-10"
+        max="10" />
+      Y
+      <input
+        type="number"
+        bind:value={pos[c].y}
+        on:change={updateDistance(c)} />
+      <input
+        type="range"
+        bind:value={pos[c].y}
+        on:change={updateDistance(c)}
+        min="-10"
+        max="10" />
+    </fieldset>
+    <audio id={'audio' + c} />
 
-  <button on:click={handleClick}>{buttonName} Playback</button>
-  <button on:click={handleRecord}>{buttonName} Recording</button>
+    <button
+      on:click={() => {
+        handleClick(c);
+      }}>
+      Start Playback User {c}
+    </button>
+
+    <button
+      on:click={() => {
+        handleRecord(c);
+      }}>
+      Start Recording User {c}
+    </button>
+  {/each}
 
 </main>

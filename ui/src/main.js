@@ -1,18 +1,30 @@
 import App from "./App.svelte";
 let buttonName = "Start";
-let pos1 = { x: 0, y: 0 };
+let clients = [1, 2];
+let pos = [];
+for (let i = 0; i < clients.length; i++) {
+  pos[clients[i]] = { x: 0, y: 0 };
+}
 
-let listener;
+let listener = [];
 let audioCtx;
-let handleClick = () => {
+
+let handleClick = (id) => {
+
+  // clear out the buffer before we start listening so we get the latest and greatest stream
+  try {
+    await fetch("/clearBuffer/" + id, { method: "POST" });
+  } catch (err) {
+    console.log("error", err);
+  }
+
+
   const AudioContext = window.AudioContext || window.webkitAudioContext;
   audioCtx = new AudioContext();
 
   /* Panner for spatial audio: */
   const panner = audioCtx.createPanner();
-  // panner.setOrientation(1, 0, 0);
-  listener = audioCtx.listener;
-  // listener.setOrientation(0, 0, -1, 0, 1, 0);
+  listener[id] = audioCtx.listener;
 
   panner.panningModel = "HRTF";
   panner.distanceModel = "inverse";
@@ -23,27 +35,32 @@ let handleClick = () => {
   panner.coneOuterAngle = 0;
   panner.coneOuterGain = 0;
 
-  let audio = document.querySelector("audio");
+  let audio = document.querySelector("#audio" + id);
   var audioSrc = audioCtx.createMediaElementSource(audio);
   audioSrc.connect(panner).connect(audioCtx.destination);
-  audio.src = "/audio/1";
+  audio.src = "/audio/" + id;
   audio.controls = true;
   audio.play();
 };
 
-let updateDistance = () => {
-  if (!listener) {
+let updateDistance = (id) => {
+  let l = listener[id];
+  let pos1 = pos[id];
+
+  if (!l) {
     console.log("not updating, listener is not active");
     return;
   }
   console.log("updating distances", pos1);
-  listener.positionX.setValueAtTime(-pos1.x, audioCtx.currentTime);
-  listener.positionY.setValueAtTime(pos1.y, audioCtx.currentTime);
+  l.positionX.setValueAtTime(-pos1.x, audioCtx.currentTime);
+  l.positionY.setValueAtTime(pos1.y, audioCtx.currentTime);
 };
 
-let handleRecord = async () => {
+let handleRecord = async (id) => {
   var constraints = { audio: true };
   console.log("getting mediastream:");
+  // clear out buffer for user:
+
   try {
     let mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
 
@@ -52,7 +69,7 @@ let handleRecord = async () => {
     mediaRecorder.ondataavailable = async (e) => {
       console.log("data is available...");
       try {
-        await fetch("/audio/1", {
+        await fetch("/audio/" + id, {
           method: "POST",
           body: e.data,
         });
@@ -69,11 +86,11 @@ let handleRecord = async () => {
 const app = new App({
   target: document.body,
   props: {
-    buttonName: buttonName,
     handleClick: handleClick,
     updateDistance: updateDistance,
     handleRecord: handleRecord,
-    pos1: pos1,
+    pos: pos,
+    clients: clients,
   },
 });
 
