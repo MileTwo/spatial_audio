@@ -3,21 +3,21 @@ let buttonName = "Start";
 let pos1 = { x: 0, y: 0 };
 
 let listener;
-
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-let audioCtx = new AudioContext();
-
+let audioCtx;
 let handleClick = () => {
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  audioCtx = new AudioContext();
+
   /* Panner for spatial audio: */
   const panner = audioCtx.createPanner();
-  panner.setOrientation(1, 0, 0);
+  // panner.setOrientation(1, 0, 0);
   listener = audioCtx.listener;
-  listener.setOrientation(0, 0, -1, 0, 1, 0);
+  // listener.setOrientation(0, 0, -1, 0, 1, 0);
 
   panner.panningModel = "HRTF";
   panner.distanceModel = "inverse";
   panner.refDistance = 1;
-  panner.maxDistance = 10000;
+  panner.maxDistance = 100;
   panner.rolloffFactor = 1;
   panner.coneInnerAngle = 360;
   panner.coneOuterAngle = 0;
@@ -26,12 +26,16 @@ let handleClick = () => {
   let audio = document.querySelector("audio");
   var audioSrc = audioCtx.createMediaElementSource(audio);
   audioSrc.connect(panner).connect(audioCtx.destination);
-  audio.src = "http://localhost:3001/audio/1";
+  audio.src = "/audio/1";
   audio.controls = true;
   audio.play();
 };
 
 let updateDistance = () => {
+  if (!listener) {
+    console.log("not updating, listener is not active");
+    return;
+  }
   console.log("updating distances", pos1);
   listener.positionX.setValueAtTime(-pos1.x, audioCtx.currentTime);
   listener.positionY.setValueAtTime(pos1.y, audioCtx.currentTime);
@@ -48,7 +52,7 @@ let handleRecord = async () => {
     mediaRecorder.ondataavailable = async (e) => {
       console.log("data is available...");
       try {
-        await fetch("http://localhost:3001/audio/1", {
+        await fetch("/audio/1", {
           method: "POST",
           body: e.data,
         });
@@ -56,7 +60,7 @@ let handleRecord = async () => {
         console.log("error", err);
       }
     };
-    mediaRecorder.start(500);
+    mediaRecorder.start(1000);
   } catch (err) {
     console.log("error", err);
   }
