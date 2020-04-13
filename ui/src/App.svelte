@@ -30,7 +30,13 @@
 </style>
 
 <main>
-
+  <button
+    on:click={() => {
+      pos.push({ x: 0, y: 0, z: 0 });
+      clients = [...clients, clients.length + 1];
+    }}>
+    Add User
+  </button>
   {#each clients as c}
     <fieldset>
       <legend>Sound {c}</legend>
