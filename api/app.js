@@ -6,11 +6,9 @@ const cors = require("cors");
 const port = 3001;
 const proxy = require("express-http-proxy");
 
-var streams = require("memory-streams");
 var streamBuffers = require("stream-buffers");
 
 const globalStreams = {};
-const globalBuffers = {};
 
 app.unsubscribe(cors());
 app.post("/audio/:id", function (req, res) {
@@ -76,6 +74,6 @@ app.get("/audio", function (req, res) {
     fs.createReadStream(path).pipe(res);
   }
 });
-
+app.use("/build", express.static("build"));
 app.use("/", proxy("localhost:5000"));
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
