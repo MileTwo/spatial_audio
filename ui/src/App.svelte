@@ -34,44 +34,62 @@
   {#each clients as c}
     <fieldset>
       <legend>Sound {c}</legend>
-      X
-      <input
-        type="number"
-        bind:value={pos[c].x}
-        on:change={updateDistance(c)} />
-      <input
-        type="range"
-        bind:value={pos[c].x}
-        on:change={updateDistance(c)}
-        min="-10"
-        max="10" />
-      Y
-      <input
-        type="number"
-        bind:value={pos[c].y}
-        on:change={updateDistance(c)} />
-      <input
-        type="range"
-        bind:value={pos[c].y}
-        on:change={updateDistance(c)}
-        min="-10"
-        max="10" />
+      <div>
+        X
+        <input
+          type="number"
+          bind:value={pos[c].x}
+          on:change={updateDistance(c)} />
+        <input
+          type="range"
+          bind:value={pos[c].x}
+          on:change={updateDistance(c)}
+          min="-10"
+          max="10" />
+      </div>
+      <div>
+        Y
+        <input
+          type="number"
+          bind:value={pos[c].y}
+          on:change={updateDistance(c)} />
+        <input
+          type="range"
+          bind:value={pos[c].y}
+          on:change={updateDistance(c)}
+          min="-10"
+          max="10" />
+      </div>
+      <div>
+        Z
+        <input
+          type="number"
+          bind:value={pos[c].z}
+          on:change={updateDistance(c)} />
+        <input
+          type="range"
+          bind:value={pos[c].z}
+          on:change={updateDistance(c)}
+          min="-10"
+          max="10" />
+      </div>
+      <div>
+        <button
+          on:click={() => {
+            handleClick(c);
+          }}>
+          Start Playback User {c}
+        </button>
+
+        <button
+          on:click={() => {
+            handleRecord(c);
+          }}>
+          Start Recording User {c}
+        </button>
+      </div>
+      <audio id={'audio' + c} />
     </fieldset>
-    <audio id={'audio' + c} />
-
-    <button
-      on:click={() => {
-        handleClick(c);
-      }}>
-      Start Playback User {c}
-    </button>
-
-    <button
-      on:click={() => {
-        handleRecord(c);
-      }}>
-      Start Recording User {c}
-    </button>
   {/each}
 
 </main>

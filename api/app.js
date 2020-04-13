@@ -13,6 +13,7 @@ const globalStreams = {};
 app.unsubscribe(cors());
 app.post("/clearBuffer/:id", function (req, res) {
   const _id = req.params.id;
+  console.log("Status: clearing buffer: " + _id);
   try {
     let stream = new streamBuffers.ReadableStreamBuffer({});
     globalStreams[_id] = stream;

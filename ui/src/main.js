@@ -3,22 +3,13 @@ let buttonName = "Start";
 let clients = [1, 2];
 let pos = [];
 for (let i = 0; i < clients.length; i++) {
-  pos[clients[i]] = { x: 0, y: 0 };
+  pos[clients[i]] = { x: 0, y: 0, z: 0 };
 }
 
 let listener = [];
 let audioCtx;
 
-let handleClick = (id) => {
-
-  // clear out the buffer before we start listening so we get the latest and greatest stream
-  try {
-    await fetch("/clearBuffer/" + id, { method: "POST" });
-  } catch (err) {
-    console.log("error", err);
-  }
-
-
+let handleClick = async (id) => {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
   audioCtx = new AudioContext();
 
@@ -54,13 +45,18 @@ let updateDistance = (id) => {
   console.log("updating distances", pos1);
   l.positionX.setValueAtTime(-pos1.x, audioCtx.currentTime);
   l.positionY.setValueAtTime(pos1.y, audioCtx.currentTime);
+  l.positionZ.setValueAtTime(pos1.z, audioCtx.currentTime);
 };
 
 let handleRecord = async (id) => {
   var constraints = { audio: true };
   console.log("getting mediastream:");
   // clear out buffer for user:
-
+  try {
+    await fetch("/clearBuffer/" + id, { method: "POST" });
+  } catch (err) {
+    console.log("error", err);
+  }
   try {
     let mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
 
