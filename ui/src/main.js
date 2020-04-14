@@ -29,7 +29,7 @@ let handleClick = async (id) => {
   let audio = document.querySelector("#audio" + id);
   var audioSrc = audioCtx.createMediaElementSource(audio);
   audioSrc.connect(panner).connect(audioCtx.destination);
-  audio.src = "/audio/" + id;
+  audio.src = "/audio/1";
   audio.controls = true;
   audio.play();
 };
@@ -51,12 +51,7 @@ let updateDistance = (id) => {
 let handleRecord = async (id) => {
   var constraints = { audio: true };
   console.log("getting mediastream:");
-  // clear out buffer for user:
-  try {
-    await fetch("/clearBuffer/" + id, { method: "POST" });
-  } catch (err) {
-    console.log("error", err);
-  }
+
   try {
     let mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
 
@@ -73,7 +68,7 @@ let handleRecord = async (id) => {
         console.log("error", err);
       }
     };
-    mediaRecorder.start(1000);
+    mediaRecorder.start(100);
   } catch (err) {
     console.log("error", err);
   }
