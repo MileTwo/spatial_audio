@@ -50,8 +50,8 @@
           type="range"
           bind:value={pos[c].x}
           on:change={updateDistance(c)}
-          min="-10"
-          max="10" />
+          min="-100"
+          max="100" />
       </div>
       <div>
         Y
@@ -63,8 +63,8 @@
           type="range"
           bind:value={pos[c].y}
           on:change={updateDistance(c)}
-          min="-10"
-          max="10" />
+          min="-100"
+          max="100" />
       </div>
       <div>
         Z
@@ -76,8 +76,8 @@
           type="range"
           bind:value={pos[c].z}
           on:change={updateDistance(c)}
-          min="-10"
-          max="10" />
+          min="-100"
+          max="100" />
       </div>
       <div>
         <button

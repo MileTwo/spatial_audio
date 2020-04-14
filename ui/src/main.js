@@ -20,8 +20,8 @@ let handleClick = async (id) => {
   panner.panningModel = "HRTF";
   panner.distanceModel = "inverse";
   panner.refDistance = 1;
-  panner.maxDistance = 100;
-  panner.rolloffFactor = 1;
+  panner.maxDistance = 10000;
+  panner.rolloffFactor = 0.8;
   panner.coneInnerAngle = 360;
   panner.coneOuterAngle = 0;
   panner.coneOuterGain = 0;
